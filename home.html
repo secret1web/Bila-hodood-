@@ -1,1 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="بلا حدود — مساحة مجهولة للتعبير دون اسم">
+  <title>بلا حدود — مساحة دون اسم</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="main-header">
+      <div class="brand">
+        <div class="brand-icon">♡</div>
+        <div>
+          <h1 class="brand-title">بلا حدود</h1>
+          <p class="brand-sub">مساحة مجهولة دون اسم</p>
+        </div>
+      </div>
+      <div class="anonymous-badge">مجهول 100%</div>
+    </header>
+
+    <!-- PUBLISH -->
+    <section class="publish-card">
+      <div class="section-title">
+        <span>اكتب ما بداخلك</span>
+        <span class="lock-icon">🔒</span>
+      </div>
+      <p class="publish-description">
+        لا اسم، لا حساب، لا أحكام. فقط مساحة آمنة للتعبير.
+      </p>
+
+      <select id="inputCategory">
+        <option value="أفكار لا تُقال">أفكار لا تُقال</option>
+        <option value="عائلة">عائلة</option>
+        <option value="علاقات">علاقات</option>
+      </select>
+
+      <textarea
+        id="inputText"
+        maxlength="3000"
+        placeholder="اكتب ما لا تستطيع قوله في مكان آخر..."
+      ></textarea>
+
+      <div class="form-bottom">
+        <span id="characterCount" class="character-count">0 / 3000</span>
+        <span class="privacy-note">لا يتم حفظ هويتك</span>
+      </div>
+
+      <button id="submitButton" class="btn-submit" type="button">
+        نشر دون اسم
+      </button>
+    </section>
+
+    <!-- SEARCH -->
+    <section class="search-section">
+      <div class="search-wrapper">
+        <span class="search-icon">⌕</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="ابحث في الاعترافات..."
+          autocomplete="off"
+        >
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <nav id="categories" class="categories" aria-label="التصنيفات">
+      <button class="chip active" type="button" data-category="الكل">الكل</button>
+      <button class="chip" type="button" data-category="اعترافاتي">🤍 اعترافاتي</button>
+      <button class="chip" type="button" data-category="أفكار لا تُقال">أفكار لا تُقال</button>
+      <button class="chip" type="button" data-category="عائلة">عائلة</button>
+      <button class="chip" type="button" data-category="علاقات">علاقات</button>
+    </nav>
+
+    <!-- FEED -->
+    <main id="feedContainer" class="feed"></main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div>♡ مساحة بلا أحكام</div>
+      <div>جميع المشاركات مجهولة</div>
+      <div style="margin-top: 10px; font-size: 0.8rem; opacity: 0.8; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px;">
+        &copy; <span id="currentYear"></span> بلا حدود. جميع الحقوق محفوظة.
+      </div>
+    </footer>
+  </div>
+
+  <!-- CUSTOM CONFIRM MODAL -->
+  <div id="customConfirmModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">⚠️ تأكيد الإبلاغ</div>
+      <div class="modal-desc">هل أنت تأكد من إبلاغ الإدارة عن هذا المنشور؟</div>
+      <div class="modal-actions">
+        <button class="modal-btn btn-confirm-report" id="btnConfirmReportAction" type="button">إبلاغ</button>
+        <button class="modal-btn btn-cancel-report" id="btnCancelReportAction" type="button">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SCRIPT FOR AUTOMATIC YEAR -->
+  <script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  </script>
+  <!-- APP -->
+  <script src="app.js"></script>
+</body>
+</html>
 
