@@ -1,1 +1,280 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم الإدارية — بلا حدود</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
+    body { background: #0b0b0e; color: #e2e8f0; padding: 15px; }
+    
+    .container { max-width: 800px; margin: 0 auto; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    .stat-card { background: #16161a; border: 1px solid #26262e; padding: 12px; border-radius: 10px; text-align: center; }
+    .stat-card .num { font-size: 1.5rem; font-weight: 800; color: #d4af37; }
+    .stat-card .label { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
 
+    .control-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .search-input, .filter-select { background: #16161a; border: 1px solid #26262e; color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; }
+    .search-input { flex: 1; min-width: 200px; }
+    
+    .card { background: #16161a; border: 1px solid #26262e; border-radius: 12px; padding: 16px; margin-bottom: 15px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .badge-cat { background: rgba(212, 175, 55, 0.15); color: #d4af37; border: 1px solid rgba(212, 175, 55, 0.3); padding: 2px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
+    .badge-reports { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; }
+    
+    .text-content { font-size: 1.05rem; line-height: 1.6; color: #f1f5f9; white-space: pre-wrap; margin-bottom: 12px; }
+    
+    .meta-info { display: flex; gap: 12px; font-size: 0.78rem; color: #64748b; border-top: 1px solid #22222a; padding-top: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .meta-info span { display: flex; align-items: center; gap: 4px; }
+    
+    .comments-section { background: #0f0f12; border-radius: 8px; padding: 10px; margin-bottom: 12px; border: 1px solid #1e1e24; }
+    .comment-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px solid #1a1a20; }
+    .comment-item:last-child { border-bottom: none; }
+
+    .actions { display: flex; gap: 8px; }
+    button { flex: 1; padding: 9px; border: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+    .btn-approve { background: #10b981; color: #000; }
+    .btn-delete { background: #ef4444; color: #fff; }
+    .btn-sm-del { background: #334155; color: #ef4444; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; width: auto; flex: none; }
+
+    .login-box { max-width: 360px; margin: 80px auto; text-align: center; background: #16161a; padding: 25px; border-radius: 12px; border: 1px solid #26262e; }
+    input[type="email"], input[type="password"] { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0b0e; color: #fff; text-align: center; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- شاشة تسجيل الدخول الآمنة -->
+  <div id="loginSection" class="login-box">
+    <h3 style="color:#d4af37; margin-bottom: 5px;">لوحة الإدارة 🛡️</h3>
+    <p style="font-size:0.8rem; color:#888; margin-bottom: 15px;">تسجيل الدخول بحساب الأدمن</p>
+    <input type="email" id="adminEmail" placeholder="البريد الإلكتروني">
+    <input type="password" id="adminPassword" placeholder="كلمة السر">
+    <button onclick="handleLogin()" id="loginBtn" style="background: #d4af37; color: #000; width: 100%;">تسجيل الدخول</button>
+  </div>
+
+  <!-- لوحة التحكم الرئيسية -->
+  <div id="adminPanel" class="container hidden">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <span style="font-size:0.85rem; color:#888;" id="userBadge"></span>
+      <button onclick="handleLogout()" style="background:#26262e; color:#ccc; width:auto; padding:5px 12px;">خروج</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="num" id="stTotal">0</div><div class="label">إجمالي المنشورات</div></div>
+      <div class="stat-card"><div class="num" id="stViews" style="color:#3b82f6">0</div><div class="label">إجمالي المشاهدات</div></div>
+      <div class="stat-card"><div class="num" id="stReactions" style="color:#10b981">0</div><div class="label">التفاعلات</div></div>
+      <div class="stat-card"><div class="num" id="stReports" style="color:#ef4444">0</div><div class="label">البلاغات المعلقة</div></div>
+    </div>
+
+    <div class="control-bar">
+      <input type="text" id="searchInput" class="search-input" placeholder="بحث في محتوى المنشورات..." oninput="filterData()">
+      <select id="filterStatus" class="filter-select" onchange="filterData()">
+        <option value="all">كل المنشورات</option>
+        <option value="flagged">المُبلغ عنها فقط</option>
+        <option value="active">النشطة فقط</option>
+      </select>
+    </div>
+
+    <div id="confessionsList"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://ukwwsmtirjneylszhcgv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_wV7uMO8ZFsTw_tLCRidQIA_HVxsPOPV";
+
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let rawConfessions = [];
+
+    // التحقق من وجود جلسة مسجلة مسبقاً
+    window.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session } } = await db.auth.getSession();
+      if (session) {
+        showAdminPanel(session.user.email);
+      }
+    });
+
+    async function handleLogin() {
+      const email = document.getElementById("adminEmail").value;
+      const password = document.getElementById("adminPassword").value;
+      const btn = document.getElementById("loginBtn");
+
+      if (!email || !password) {
+        alert("يرجى إدخال البريد وكلمة السر");
+        return;
+      }
+
+      btn.textContent = "جارٍ التحقق...";
+      btn.disabled = true;
+
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+      btn.textContent = "تسجيل الدخول";
+      btn.disabled = false;
+
+      if (error) {
+        alert("خطأ في الدخول: " + error.message);
+      } else {
+        showAdminPanel(data.user.email);
+      }
+    }
+
+    async function handleLogout() {
+      await db.auth.signOut();
+      document.getElementById("loginSection").classList.remove("hidden");
+      document.getElementById("adminPanel").classList.add("hidden");
+    }
+
+    function showAdminPanel(email) {
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("adminPanel").classList.remove("hidden");
+      document.getElementById("userBadge").textContent = "الأدمن: " + email;
+      fetchAdminData();
+    }
+
+    async function fetchAdminData() {
+      const container = document.getElementById("confessionsList");
+      container.innerHTML = "<p style='text-align:center; padding: 20px; color:#888;'>جارٍ جلب البيانات والأرقام...</p>";
+
+      const { data, error } = await db
+        .from("confessions")
+        .select("*, comments(*)")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        alert("خطأ في التحميل: " + error.message);
+        return;
+      }
+
+      rawConfessions = data;
+      renderStats(data);
+      filterData();
+    }
+
+    function renderStats(data) {
+      let totalViews = 0, totalReactions = 0, totalReports = 0;
+      data.forEach(item => {
+        totalViews += (item.views_count || 0);
+        totalReactions += (item.understands_count || 0) + (item.not_alone_count || 0);
+        totalReports += (item.reports_count || 0);
+      });
+
+      document.getElementById("stTotal").textContent = data.length;
+      document.getElementById("stViews").textContent = totalViews;
+      document.getElementById("stReactions").textContent = totalReactions;
+      document.getElementById("stReports").textContent = totalReports;
+    }
+
+    function filterData() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const statusFilter = document.getElementById("filterStatus").value;
+
+      const filtered = rawConfessions.filter(item => {
+        const matchesSearch = item.text ? item.text.toLowerCase().includes(query) : false;
+        const isFlagged = item.reports_count > 0 || item.status === "flagged";
+        
+        let matchesStatus = true;
+        if (statusFilter === "flagged") matchesStatus = isFlagged;
+        if (statusFilter === "active") matchesStatus = item.status === "active" && !isFlagged;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      renderList(filtered);
+    }
+
+    function renderList(list) {
+      const container = document.getElementById("confessionsList");
+      container.innerHTML = "";
+
+      if (list.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding: 40px; color:#666;'>لا توجد نتائج تطابق التصفية.</p>";
+        return;
+      }
+
+      list.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const dateStr = new Date(item.created_at).toLocaleString('ar-TN', { dateStyle: 'medium', timeStyle: 'short' });
+        const commentsList = item.comments || [];
+
+        let commentsHTML = "";
+        if (commentsList.length > 0) {
+          commentsHTML = `
+            <div class="comments-section">
+              <p style="font-size:0.75rem; color:#888; margin-bottom:6px;">الردود المرفقة (${commentsList.length}):</p>
+              ${commentsList.map(c => `
+                <div class="comment-item">
+                  <span>${escapeHtml(c.comment_text || c.text || "")}</span>
+                  <button class="btn-sm-del" onclick="deleteComment('${c.id}')">حذف الرد</button>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="badge-cat">${item.category || 'عام'}</span>
+            ${item.reports_count > 0 ? `<span class="badge-reports">⚠️ بلاغات: ${item.reports_count}</span>` : ''}
+          </div>
+
+          <div class="text-content">${escapeHtml(item.text || "")}</div>
+
+          <div class="meta-info">
+            <span>👁️ ${item.views_count || 0} مشاهدة</span>
+            <span>🤝 ${item.understands_count || 0} أفهمك</span>
+            <span>🤍 ${item.not_alone_count || 0} لست وحدك</span>
+            <span>🕒 ${dateStr}</span>
+          </div>
+
+          ${commentsHTML}
+
+          <div class="actions">
+            <button class="btn-approve" onclick="resetReports('${item.id}')">تصفير البلاغات / تفعيل</button>
+            <button class="btn-delete" onclick="deleteConfession('${item.id}')">حذف الاعتراف بالكامل</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function resetReports(id) {
+      const { error } = await db.from("confessions").update({ reports_count: 0, status: "active" }).eq("id", id);
+      if (error) alert("خطأ: " + error.message);
+      else fetchAdminData();
+    }
+
+    async function deleteConfession(id) {
+      if (!confirm("هل أنت متأكد من حذف المنشور نهائياً؟")) return;
+      
+      const { error } = await db.from("confessions").delete().eq("id", id);
+      
+      if (error) {
+        alert("خطأ في الحذف: " + error.message);
+      } else {
+        fetchAdminData();
+      }
+    }
+
+    async function deleteComment(commentId) {
+      if (!confirm("حذف هذا الرد فقط؟")) return;
+      const { error } = await db.from("comments").delete().eq("id", commentId);
+      if (error) alert("خطأ: " + error.message);
+      else fetchAdminData();
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = String(str || "");
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
