@@ -96,7 +96,7 @@ async function loadData() {
     if (response.error) {
       console.error("Load error:", response.error);
       container.innerHTML = '<div class="empty">تعذر تحميل المنشورات.</div>';
-      showToast(getSupabaseErrorMessage(response.error));
+      showToast(JSON.stringify(response.error));
       return;
     }
 
@@ -496,13 +496,8 @@ async function executeReportPost() {
   const { confessionId, currentCount } = pendingReportData;
   closeReportModal();
 
-  const newCount = Number(currentCount || 0) + 1;
-
   try {
-    const response = await supabaseClient
-      .from("confessions")
-      .update({ reports_count: newCount })
-      .eq("id", confessionId);
+    const response = await supabaseClient.rpc("increment_report", { p_confession_id: confessionId });
 
     if (response.error) {
       showToast(getSupabaseErrorMessage(response.error));
