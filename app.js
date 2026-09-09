@@ -406,7 +406,7 @@ async function toggleReaction(confessionId, reactionType) {
   try {
     let response;
     if (existing) {
-      response = await supabaseClient.from("reactions").delete().eq("id", existing.id);
+      response = await supabaseClient.rpc("remove_reaction", { p_reaction_id: existing.id, p_user_session_id: sessionId });
     } else {
       response = await supabaseClient.from("reactions").insert([
         { confession_id: confessionId, reaction_type: reactionType, user_session_id: sessionId }
