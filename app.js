@@ -96,7 +96,7 @@ async function loadData() {
     if (response.error) {
       console.error("Load error:", response.error);
       container.innerHTML = '<div class="empty">تعذر تحميل المنشورات.</div>';
-      showToast(JSON.stringify(response.error));
+      showToast(getSupabaseErrorMessage(response.error));
       return;
     }
 
